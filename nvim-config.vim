@@ -1,4 +1,4 @@
-:set number
+:set relativenumber
 :set autoindent
 :set tabstop=2
 :set shiftwidth=2
@@ -7,6 +7,7 @@
 :set cursorline
 
 let &g:guifont = 'JetBrains\ Mono:h10'
+let g:neovide_transparency=0.98
 
 call plug#begin()
 
@@ -32,10 +33,7 @@ Plug 'davidhalter/jedi-vim' " Python Autocompletion
 Plug 'https://github.com/craftzdog/solarized-osaka.nvim' " Solarized Osaka Theme
 Plug 'octol/vim-cpp-enhanced-highlight' " C++ Highlighting
 Plug 'windwp/nvim-ts-autotag' " Auto Tag
-Plug 'psf/black', {'branch': 'main'} " Python Black Formatter
-Plug 'Vimjas/vim-python-pep8-indent' " Python PEP8 Indent
-Plug 'fisadev/vim-isort' " Python Import Sorter
-Plug 'klen/python-mode' " Python Mode
+Plug 'https://github.com/shrivastavasamarth22/sequoia_retro_nvim' " Sequoia Retro Theme
 
 set encoding=UTF-8
 
@@ -46,9 +44,7 @@ set hidden
 " Configuration for Python
 " Declare Python 3 path
 let g:python3_host_prog = 'C:\Users\shriv\AppData\Local\Programs\Python\Python39\python.exe'
-let g:coc_global_extensions = ['coc-pyright']
-autocmd  BufWritePre *.py execute ':Black' " Format with Black on save
-autocmd  BufWritePre *.py execute ':Isort' " Sort imports on save
+let g:coc_global_extensions = ['coc-python']
 
 
 " Treesitter configuration for web dev
@@ -56,7 +52,6 @@ lua << EOF
 require'nvim-treesitter.configs'.setup {
 	ensure_installed = { "html", "css", "javascript", "typescript", "json" },
 	highlight = { enable = true },
-	autotag = { enable = true },
 }
 EOF
 
@@ -94,7 +89,41 @@ autocmd BufWritePost * NERDTreeRefresh
 lua require('bufferline').setup{}
 
 " Set up Indent Blankline
-lua require("ibl").setup()
+let highlight = [
+	\ "RainbowRed",
+	\ "RainbowYellow",
+	\ "RainbowBlue",
+	\ "RainbowOrange",
+	\ "RainbowGreen",
+	\ "RainbowViolet",
+	\ "RainbowCyan"
+\ ]
+
+" Define a function to create highlight groups based on colorscheme
+function! SetupHighlightGroups()
+	call nvim_set_hl(0, "RainbowRed", {"fg": "#da674b"}) " Matches 'String'
+	call nvim_set_hl(0, "RainbowYellow", {"fg": "#e8b246"}) " Matches 'IncSearch'
+	call nvim_set_hl(0, "RainbowBlue", {"fg": "#5c87a4"}) " Matches 'Type'
+	call nvim_set_hl(0, "RainbowOrange", {"fg": "#a27e57"}) " Matches 'StorageClass'
+	call nvim_set_hl(0, "RainbowGreen", {"fg": "#648f68"}) " Matches 'Keyword'
+	call nvim_set_hl(0, "RainbowViolet", {"fg": "#43444D"}) " Matches 'Comment'
+	call nvim_set_hl(0, "RainbowCyan", {"fg": "#829fa7"}) " Matches 'DiagnosticError'
+endfunction
+
+" Use an autocommand to reset highlight groups every time the colorscheme changes
+augroup HighlightSetup
+	autocmd!
+	autocmd ColorScheme * call SetupHighlightGroups()
+augroup END
+
+" Call the setup function immediately to initialize the highlight groups
+call SetupHighlightGroups()
+
+" Configure ibl plugin setup
+lua << EOF
+require("ibl").setup { indent = { highlight = vim.g.highlight } }
+EOF
+
 
 " Set up commentary
 autocmd FileType python,sh,html,xml,yaml,yml setlocal commentstring=#\ %s 
@@ -127,14 +156,14 @@ nnoremap <C-c> :bd<CR>
 
 :set termguicolors
 :set background=dark
-:colorscheme gruvbox
+:colorscheme sequoia_retro
 
 let g:NERDTreeDirArrowExpandable="+"
 let g:NERDTreeDirArrowCollapsible="~"
 
 " air-line 
 let g:airline_powerline_fonts = 1
-let g:airline_theme="gruvbox"
+let g:airline_theme="sequoia_retro"
 
 if !exists('g:airline_symbols')
 	let g:airline_symbols = {}
